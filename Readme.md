@@ -1,6 +1,10 @@
 ## How to use
 Just run run.sh, it would launch a docker with port 8088
 
+# The logic
+Treat the investment as transactions, and sum up to return the state of all investments on a given date
+And with investment id, the specific investment could be modified
+
 ## API
 
   ### Get /investments?date=2018-01-01
