@@ -23,19 +23,30 @@ class TestApi(unittest.TestCase):
         assert res == []
 
     def test_post(self):
-        resp = self.app.post('/investments', data=json.dumps({
+        resp1 = self.app.post('/investments', data=json.dumps({
             "company": "Meetly",
             "quantity": 1000,
             "cost": 1000
         }), content_type='application/json')
 
-        res = json.loads(resp.get_data())
+        resp2 = self.app.post('/investments', data=json.dumps({
+            "company": "Meet",
+            "quantity": 100,
+            "cost": 100,
+            "creation_date": "2018-06-06"
+        }), content_type='application/json')
 
-        assert resp.status_code == 201
-        assert res['company'] == 'Meetly'
-        assert res['quantity'] == 1000
-        assert res['cost'] == 1000
-        assert res['creation_date'] == datetime.today().strftime('%Y-%m-%d')
+        res1 = json.loads(resp1.get_data())
+        res2 = json.loads(resp2.get_data())
+
+        assert resp1.status_code == 201
+        assert resp2.status_code == 201
+        assert res1['company'] == 'Meetly'
+        assert res1['quantity'] == 1000
+        assert res1['cost'] == 1000
+        assert res1['creation_date'] == datetime.today().strftime('%Y-%m-%d')
+
+        assert res2['creation_date'] == "2018-06-06"
 
     def test_put(self):
         post_resp = self.app.post('/investments', data=json.dumps({
@@ -49,7 +60,8 @@ class TestApi(unittest.TestCase):
         resp = self.app.put('/investments/{}'.format(id), data=json.dumps({
             "company": "IMIM",
             "quantity": 200,
-            "cost": 300
+            "cost": 300,
+            "creation_date": "2018-06-07"
         }), content_type='application/json')
 
         res = json.loads(resp.get_data())
@@ -59,7 +71,7 @@ class TestApi(unittest.TestCase):
         assert res['company'] == 'IMIM'
         assert res['quantity'] == 200
         assert res['cost'] == 300
-        assert res['creation_date'] == datetime.today().strftime('%Y-%m-%d')
+        assert res['creation_date'] == "2018-06-07"
 
     def test_get_by_date(self):
         for i in range(1, 13):
@@ -67,18 +79,17 @@ class TestApi(unittest.TestCase):
                 "company": "Meetly{}".format(i),
                 "quantity": 1000,
                 "cost": 1000,
-                "creation_date": "2018-{:02d}-01".format(i)
+                "creation_date": "2017-{:02d}-01".format(i)
             }), content_type='application/json')
 
-        resp = self.app.get('/investments?date=2018-08-11')
-        # resp = self.app.get('/investments')
-        res = json.loads(resp.get_data())
-        print(res)
+        get_resp = self.app.get('/investments?date=2017-08-11')
+
+        res = json.loads(get_resp.get_data())
+
         eighth = res[7]
 
         assert len(res) == 8
         assert eighth["company"] == "Meetly8"
-        assert eighth["creation_date"] == "2018-08-01"
 
     def test_update_stock(self):
         for i in range(1, 13):
